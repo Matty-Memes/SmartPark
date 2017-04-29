@@ -1,17 +1,17 @@
 package seshclub7.smartpark;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -26,7 +26,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     UiSettings mUiSettings;
-    Bitmap marker = BitmapFactory.decodeFile("res/marker.png");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +35,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
 
+    }
 
     /**
      * Manipulates the map once available.
@@ -51,63 +50,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMinZoomPreference(16.5f);
-        mMap.setMaxZoomPreference(20.0f);
         mUiSettings = mMap.getUiSettings();
         mUiSettings.setZoomControlsEnabled(true);
-        mUiSettings.setZoomGesturesEnabled(false);
-        mUiSettings.setMapToolbarEnabled(true);
 
 
         // Add a marker in Sydney and move the camera
         LatLng Belfast = new LatLng(54.595976, -5.930908);
-        try {
-            mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(marker))
-                    .position(Belfast).title(getMyLocationAddress()));
-        }
-        catch (NullPointerException e)
-        {
-            System.out.print("Could not load in image");
-        }
-        mMap.addMarker(new MarkerOptions().position(Belfast).title(getMyLocationAddress()));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 16.5f));
-
+        mMap.addMarker(new MarkerOptions().position(Belfast).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker) )
+                .title("Test Street"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 17.0f));
     }
 
 
-    public String getMyLocationAddress() {
-
-        Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
-        String address = "";
-
-        try {
-
-            //Place your latitude and longitude
-            List<Address> addresses = geocoder.getFromLocation(54.595976, -5.930908, 1);
-
-            if (addresses != null) {
-
-                Address fetchedAddress = addresses.get(0);
-                StringBuilder strAddress = new StringBuilder();
-
-
-                for (int i = 0; i < fetchedAddress.getMaxAddressLineIndex(); i++) {
-                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
-                }
-
-                address = strAddress.toString();
-
-            } else
-
-                return ("No location found..!");
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "Could not get address..!", Toast.LENGTH_LONG).show();
-        }
-        return address;
-    }
 }
 
 
