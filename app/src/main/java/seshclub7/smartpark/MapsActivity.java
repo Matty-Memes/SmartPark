@@ -1,5 +1,7 @@
 package seshclub7.smartpark;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
@@ -10,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.UiSettings;
@@ -23,6 +26,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     UiSettings mUiSettings;
+    Bitmap marker = BitmapFactory.decodeFile("res/marker.png");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +51,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMinZoomPreference(16.5f);
+        mMap.setMaxZoomPreference(20.0f);
         mUiSettings = mMap.getUiSettings();
         mUiSettings.setZoomControlsEnabled(true);
+        mUiSettings.setZoomGesturesEnabled(false);
+        mUiSettings.setMapToolbarEnabled(true);
 
 
         // Add a marker in Sydney and move the camera
         LatLng Belfast = new LatLng(54.595976, -5.930908);
+        try {
+            mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(marker))
+                    .position(Belfast).title(getMyLocationAddress()));
+        }
+        catch (NullPointerException e)
+        {
+            System.out.print("Could not load in image");
+        }
         mMap.addMarker(new MarkerOptions().position(Belfast).title(getMyLocationAddress()));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 17.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 16.5f));
+
     }
 
 
