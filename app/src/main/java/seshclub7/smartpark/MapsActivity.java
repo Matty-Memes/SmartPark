@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -15,7 +14,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -25,13 +23,15 @@ import com.google.android.gms.maps.UiSettings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     UiSettings mUiSettings;
-    double allLongitude[] = {};
+    double allLongitude[] = {54.604224,54.604312,54.604337,54.604452,54.603712,54.604517,54.604309,54.604909,54.604465,54.604465,54.605205,54.604937,54.604044,54.603951,54.603626};
+    double allLatitude[] = {-5.931062,-5.931134,-5.931166,-5.931220,-5.931738,-5.932586,-5.932774,-5.930870,-5.929755,-5.929755,-5.931006,-5.930874,-5.932078,-5.931977,-5.930413};
+    double vacantLongitude[] = {54.604224,54.604312,54.604337,54.604452,54.603712,54.604517,54.604309,54.604909,54.604465};
+    double vacantLatitude[] = {-5.931062,-5.931134,-5.931166,-5.931220,-5.931738,-5.932586,-5.932774,-5.930870,-5.929755};
     double streetLongitude[] = {54.604224,54.604312,54.604337,54.604452};
     double streetLatitude[] = {-5.931062,-5.931134,-5.931166,-5.931220};
 
@@ -65,7 +65,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mUiSettings.setZoomControlsEnabled(true);
         mUiSettings.setZoomGesturesEnabled(false);
         mUiSettings.setMapToolbarEnabled(true);
-
         try {
             // Customise the styling of the base map using a JSON object defined
             // in a raw resource file.
@@ -80,12 +79,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("MapsActivityRaw", "Can't find style.", e);
         }
 
-
+        // Add a marker in Sydney and move the camera
         LatLng Belfast = new LatLng(54.604339, -5.931164);
-        mMap.addMarker(new MarkerOptions().position(Belfast).title("Donegal Street").icon((BitmapDescriptorFactory.fromResource(R.drawable.marker))));
+        loadAllMarkers();
+        //mMap.addMarker(new MarkerOptions().position(Belfast).title(getMyLocationAddress()));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 16.5f));
 
     }
+
 
     public void onMapSearch(View view) {
         EditText locationSearch = (EditText) findViewById(R.id.editText);
@@ -113,8 +114,73 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public String getMyLocationAddress() {
+
+        Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+        String address = "";
+
+        try {
+
+            //Place your latitude and longitude
+            List<Address> addresses = geocoder.getFromLocation(54.595976, -5.930908, 1);
+
+            if (addresses != null) {
+
+                Address fetchedAddress = addresses.get(0);
+                StringBuilder strAddress = new StringBuilder();
 
 
+                for (int i = 0; i < fetchedAddress.getMaxAddressLineIndex(); i++) {
+                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
+                }
+
+                address = strAddress.toString();
+
+            } else
+
+                return ("No location found..!");
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Could not get address..!", Toast.LENGTH_LONG).show();
+        }
+        return address;
+
+    }
+    private void loadAllMarkers()
+    {
+        try
+        {
+            for (int i = 0; i < 14; i++)
+            {
+                LatLng marker = new LatLng(allLongitude[i],allLatitude[i]);
+                LatLng vacant = new LatLng(vacantLongitude[i],vacantLatitude[i]);
+
+                mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).position(marker).title(getMyLocationAddress()));
+            }
+        }
+        catch (NullPointerException e)
+        {
+            System.out.print("Could not load in image");
+        }
+    }
+
+//    private void loadStreetMarkers()
+//    {
+//        try
+//        {
+//            for (int i = 0; i < 3; i++)
+//            {
+//                LatLng street = new LatLng(streetLongitude[i],streetLatitude[i]);
+//                mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).position(street).title(getMyLocationAddress()));
+//            }
+//        }
+//        catch (NullPointerException e)
+//        {
+//            System.out.print("Could not load in image");
+//        }
+//    }
 
 }
 
