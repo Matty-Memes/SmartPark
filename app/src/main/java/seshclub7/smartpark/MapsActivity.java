@@ -1,7 +1,10 @@
 package seshclub7.smartpark;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,14 +13,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
-{
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -37,19 +43,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
         LatLng Belfast = new LatLng(54.595976, -5.930908);
-        mMap.addMarker(new MarkerOptions().position(Belfast).title("Marker in Belfast"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast,17.0f));
+        mMap.addMarker(new MarkerOptions().position(Belfast).title(getMyLocationAddress()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 17.0f));
+    }
 
-//        LatLng Spaces[] = new LatLng[10];
-//        for (int i=0;i<9;i++)
-//        {
-//            Spaces[i] = new LatLng();
-//        }
+
+    public String getMyLocationAddress() {
+
+        Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+        String address = "";
+
+        try {
+
+            //Place your latitude and longitude
+            List<Address> addresses = geocoder.getFromLocation(54.595976, -5.930908, 1);
+
+            if (addresses != null) {
+
+                Address fetchedAddress = addresses.get(0);
+                StringBuilder strAddress = new StringBuilder();
+
+
+                for (int i = 0; i < fetchedAddress.getMaxAddressLineIndex(); i++) {
+                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
+                }
+
+                address = strAddress.toString();
+
+            } else
+
+                return ("No location found..!");
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Could not get address..!", Toast.LENGTH_LONG).show();
+        }
+        return address;
     }
 }
+
+
