@@ -1,10 +1,14 @@
 package seshclub7.smartpark;
 
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.UiSettings;
 
@@ -27,6 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     UiSettings mUiSettings;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +41,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
     }
 
     /**
@@ -53,12 +58,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mUiSettings = mMap.getUiSettings();
         mUiSettings.setZoomControlsEnabled(true);
 
-
-        // Add a marker in Sydney and move the camera
         LatLng Belfast = new LatLng(54.595976, -5.930908);
         mMap.addMarker(new MarkerOptions().position(Belfast).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker) )
                 .title("Test Street"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 17.0f));
+    }
+
+    public void onMapSearch(View view) {
+        EditText locationSearch = (EditText) findViewById(R.id.editText);
+        String location = locationSearch.getText().toString();
+        List<Address>addressList = null;
+
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 1);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Address address = addressList.get(0);
+            LatLng latLng = new LatLng(54.604339, -5.931164);
+            LatLng latLng1 = new LatLng(54.604700, 5.931467);
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            mMap.addMarker(new MarkerOptions().position(latLng1).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+        }
     }
 
 
