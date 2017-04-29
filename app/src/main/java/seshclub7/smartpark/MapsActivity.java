@@ -66,71 +66,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mUiSettings.setZoomGesturesEnabled(false);
         mUiSettings.setMapToolbarEnabled(true);
 
-
-        // Add a marker in Sydney and move the camera
-        LatLng Belfast = new LatLng(54.604339, -5.931164);
         try {
-            mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).position(Belfast).title(getMyLocationAddress()));
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e("MapsActivityRaw", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("MapsActivityRaw", "Can't find style.", e);
         }
-        catch (NullPointerException e)
-        {
-            System.out.print("Could not load in image");
-        }
-        //mMap.addMarker(new MarkerOptions().position(Belfast).title(getMyLocationAddress()));
+
+
+        LatLng Belfast = new LatLng(54.604339, -5.931164);
+        mMap.addMarker(new MarkerOptions().position(Belfast).title("Donegal Street").icon((BitmapDescriptorFactory.fromResource(R.drawable.marker))));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Belfast, 16.5f));
 
     }
 
+    public void onMapSearch(View view) {
+        EditText locationSearch = (EditText) findViewById(R.id.editText);
+        String location = locationSearch.getText().toString();
+        List<Address>addressList = null;
 
-    public String getMyLocationAddress() {
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 1);
 
-        Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
-        String address = "";
-
-        try {
-
-            //Place your latitude and longitude
-            List<Address> addresses = geocoder.getFromLocation(54.595976, -5.930908, 1);
-
-            if (addresses != null) {
-
-                Address fetchedAddress = addresses.get(0);
-                StringBuilder strAddress = new StringBuilder();
-
-
-                for (int i = 0; i < fetchedAddress.getMaxAddressLineIndex(); i++) {
-                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
-                }
-
-                address = strAddress.toString();
-
-            } else
-
-                return ("No location found..!");
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "Could not get address..!", Toast.LENGTH_LONG).show();
-        }
-        return address;
-
-    }
-    private void loadStreetMarkers()
-    {
-        try
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                LatLng street = new LatLng(streetLongitude[i],streetLatitude[i]);
-                mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).position(street).title(getMyLocationAddress()));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }
-        catch (NullPointerException e)
-        {
-            System.out.print("Could not load in image");
+            Address address = addressList.get(0);
+            LatLng latLng = new LatLng(54.597272, -5.931648);
+            LatLng latLng1 = new LatLng(54.597250, -5.931128);
+            LatLng latLng2 = new LatLng(554.597228, -5.932319);
+            LatLng latLng3 = new LatLng(54.597244, -5.930828);
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            mMap.addMarker(new MarkerOptions().position(latLng1).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            mMap.addMarker(new MarkerOptions().position(latLng2).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            mMap.addMarker(new MarkerOptions().position(latLng3).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
         }
     }
+
+
+
 
 }
 
